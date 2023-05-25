@@ -1,0 +1,14 @@
+package com.logic;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Vector;
+
+public interface CommonInter {
+	
+	public static Vector spl=new Vector();
+	public static Vector auditTime=new Vector();
+	public static ArrayList publicAuditList=new ArrayList();
+	public static ArrayList currentAuditList=new ArrayList();
+	public static HashMap auditingMap=new HashMap();
+}

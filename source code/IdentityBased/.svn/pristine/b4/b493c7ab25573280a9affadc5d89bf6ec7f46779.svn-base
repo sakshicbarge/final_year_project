@@ -1,0 +1,550 @@
+package com.logic;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Random;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
+import java.util.Vector;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.struts2.dispatcher.SessionMap;
+import org.apache.struts2.interceptor.SessionAware;
+
+import com.opensymphony.xwork2.ActionSupport;
+
+public class Download extends ActionSupport implements SessionAware,CommonInter
+{
+	String concatedstring="",fileName,selecAction,abspath,type,userName="";
+	ArrayList<FileUploadBean> fileredistributelist=new ArrayList<FileUploadBean>();
+
+	public ArrayList<FileUploadBean> getFileredistributelist() {
+		return fileredistributelist;
+	}
+	public void setFileredistributelist(
+			ArrayList<FileUploadBean> fileredistributelist) {
+		this.fileredistributelist = fileredistributelist;
+	}
+	public String getSelecAction() {
+		return selecAction;
+	}
+	public void setSelecAction(String selecAction) {
+		this.selecAction = selecAction;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	public String getAbspath() {
+		return abspath;
+	}
+	public void setAbspath(String abspath) {
+		this.abspath = abspath;
+	}
+	InputStream inputStream;
+	File fileToDownload;
+	long contentLength;
+	
+	public long getContentLength() {
+		return contentLength;
+	}
+	public void setContentLength(long contentLength) {
+		this.contentLength = contentLength;
+	}
+	public File getFileToDownload() {
+		return fileToDownload;
+	}
+	public void setFileToDownload(File fileToDownload) {
+		this.fileToDownload = fileToDownload;
+	}
+	public InputStream getInputStream() {
+		return inputStream;
+	}
+	public void setInputStream(InputStream inputStream) {
+		this.inputStream = inputStream;
+	}
+	public String getFileName() {
+		return fileName;
+	}
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+	String msg,recMsg="";
+	public String getRecMsg() {
+		return recMsg;
+	}
+	public void setRecMsg(String recMsg) {
+		this.recMsg = recMsg;
+	}
+	public String getMsg() {
+		return msg;
+	}
+	public void setMsg(String msg) {
+		this.msg = msg;
+	}
+	String flistName="";
+	TreeMap tmFull=new TreeMap();
+	FATFS fat=new FATFS(new BlockSplit());
+	public String getFlistName() {
+		return flistName;
+	}
+	public void setFlistName(String flistName) {
+		this.flistName = flistName;
+	}
+	String extension="";
+	String appendstring="";
+	String mappingcontent="",encodedcontent="";
+	String dum="";
+	String ownerpublickey="";
+	String ownerprivatekey="";
+	StringBuffer strContent = new StringBuffer("");
+	String ar[];
+	String servers=""; 
+	
+	ArrayList<String> downfilelist=new ArrayList<String>();
+	public ArrayList<String> getDownfilelist() {
+		return downfilelist;
+	}
+	public void setDownfilelist(ArrayList<String> downfilelist) {
+		this.downfilelist = downfilelist;
+	}
+	private static final long serialVersionUID = 1L;
+	private String status="";
+	private String username;
+	private File uploadDoc;
+	
+	SessionMap<String, Object> sessionMap;
+	
+	public SessionMap<String, Object> getSessionMap() {
+		return sessionMap;
+	}
+	public void setSessionMap(SessionMap<String, Object> sessionMap) {
+		this.sessionMap = sessionMap;
+	}
+	public void setSession(Map<String, Object> arg0) {
+		sessionMap=(SessionMap)arg0;		
+	}
+
+	public String display()
+	{			
+		return NONE;
+	}
+	
+	public File getUploadDoc() 
+	{
+		return uploadDoc;
+	} 	
+public String execute() 
+{
+	username=sessionMap.get("usrname").toString();
+	fileList(username);
+	fileredistributelist=null;
+	status="success";	
+	return status;
+}
+public String selectOption()
+{
+	if(selecAction.equalsIgnoreCase("Delete"))
+	{
+		status=deleteFile();
+	}
+	else if(selecAction.equalsIgnoreCase("Download"))
+	{
+		status=downloadFile();
+	}
+	return status;
+}
+public String downloadFile()
+{
+	try
+	{
+		String fNmeWthOutExt=flistName.split("\\.")[0].toString();
+		String userfNme=fNmeWthOutExt+".txt";
+		String auditAccessFile="";
+		auditingMap.put("UserProcess", userfNme);		
+//		if(auditingMap.containsKey("AuditProcess"))
+//		{
+//			auditAccessFile=auditingMap.get("AuditProcess").toString();
+//			System.out.println("auditAccessFile "+auditAccessFile);
+		auditStatusCheck(userfNme);
+		
+//			auditingMap.put("UserProcess", userfNme);			
+//		}
+//		else
+//		{
+//			auditingMap.put("UserProcess", userfNme);			
+//		}
+		if(sessionMap.containsKey("usrname"))
+		{
+			username=sessionMap.get("usrname").toString();
+		}
+		fileList(username);
+		sessionMap.put("selectedfile", flistName);		
+		sessionMap.put("fNmeWithOutExt",fNmeWthOutExt);
+		LinkedHashMap readMap=fat.retrieveFat(fNmeWthOutExt+".txt",username);
+		for(int i=0;i<spl.size();i++)
+		{
+		if(!spl.get(i).toString().equals("") && spl.get(i).toString().contains(":"))
+		{
+			final int cc=i;    					
+			try
+			{   		
+				TreeMap tm=new TreeMap();
+				Iterator it2=readMap.keySet().iterator();
+				 while(it2.hasNext())
+				 {
+					String key=it2.next().toString();
+					String split[]=key.split("@");	
+					String blckMapString=split[0].toString();
+					String contentMapString=split[1].toString();
+					String value=readMap.get(key).toString();
+					if(spl.get(i).toString().trim().equalsIgnoreCase(value.trim()))
+					{   
+						String mapSpl[]=blckMapString.split("_");
+						String dataBlckNo=mapSpl[1].toString();
+						String dataPackNo=mapSpl[2].toString();
+						tm.put(dataPackNo, dataBlckNo);	
+					}
+				 }
+				 if(!tm.isEmpty())
+				 {
+					 System.out.println("TreeMap with Block and Packet Mapping \n"+tm.toString());
+					 System.out.println("For Ip "+spl.get(i).toString());
+					 ArrayList al=new ArrayList(tm.values());
+					 AccessServiceCall awc=new AccessServiceCall();
+					 ArrayList alRet=awc.retrieveDataSet(spl.get(i).toString(), al, fNmeWthOutExt+".txt");
+					 System.out.println("File Packets Fetched from Ip "+spl.get(i).toString()+"\n Requested packets "+tm.size()+" Responded Packets "+alRet.size());
+					 Iterator iii=tm.keySet().iterator();
+					 int ic=0;
+					 while (iii.hasNext()) {
+						 String pCont=alRet.get(ic).toString();
+						 ic++;
+						 String key=iii.next().toString();
+						 tmFull.put(key, pCont);
+					 }
+				 }
+			}			
+			catch (Exception e)
+			{
+					e.printStackTrace();
+			}
+		}
+	}
+	
+//	========================"Downloading Packets From Servers Finished============="
+	
+	File fTxt=null;
+	String fulContent=SignCheckFile(fNmeWthOutExt+".txt",username);
+	if(!fulContent.equals(""))
+	{
+		Base64 bs=new Base64();	
+		File fSrc=new File("webapps/IdentityBased/UploadStorage/"+fNmeWthOutExt+"."+extension);
+		fSrc.delete();
+		fTxt=new File("webapps/IdentityBased/UploadStorage/"+fNmeWthOutExt+"_enc.txt");
+		fTxt.delete();
+		Thread.sleep(100);
+		FileOutputStream fos=new FileOutputStream(fSrc);
+		fos.write(bs.decode(fulContent));
+		fos.close();
+		FileOutputStream fost=new FileOutputStream(fTxt);
+		fost.write(fulContent.getBytes());
+		fost.close();
+		msg="download";
+		status="success";
+	}
+	else
+	{
+		System.out.println("full content empty... Signature Failed in Download Process..");
+		fileredistributelist=null;
+		msg="fail";
+		status="error";
+	}
+	
+//	================================"DownLoad Signature Check Completed"===============
+	if(status.equalsIgnoreCase("success"))
+	{
+		ReDistribute(username,fTxt,extension,fNmeWthOutExt);
+	}
+	
+	}
+	catch (Exception e) {
+	e.printStackTrace();
+	}
+	
+//	====================="FAT UPDATE COMPLETED================="
+	//System.out.println("=====msg====="+msg);
+	return status;
+}
+public void ReDistribute(String usName,File fTxt,String extension,String fNmeWthOutExt) throws Exception
+{
+	BlockSplit bl=new BlockSplit();
+	bl.splitFile(fTxt,extension);
+	fat=new FATFS(bl);
+	fat.updateFat(usName);
+	LinkedHashMap readmap=fat.retrieveFat(fNmeWthOutExt+".txt",usName);
+	Upload ul=new Upload();
+	System.out.println("UPdated LKM SIZE  "+bl.lkm.size());
+	System.out.println("Redistributing newly Generated Packets to Servers ....");
+	fileredistributelist=ul.DistributePackets(readmap,bl.lkm,fNmeWthOutExt,fNmeWthOutExt+"."+extension);
+//	auditingMap.remove("UserProcess");	
+}
+public String SignCheckFile(String fNme,String uName)
+{
+	StringBuffer fullCont=new StringBuffer();
+	boolean bP=true;
+	boolean bF=true;
+	LinkedHashMap lmFOrUser=fat.retrieveFat(fNme,uName);
+	Iterator iCheck=lmFOrUser.keySet().iterator();
+	String spl[]=null;
+	while (iCheck.hasNext()) 
+	{
+		String key=iCheck.next().toString().trim();
+		spl=key.split("_");
+		String blckSign=spl[2].toString();		
+		String splBlck[]=blckSign.split("@");
+		String blck=splBlck[0].toString();
+		String blckTag=splBlck[1].toString();
+		String packet=tmFull.get(blck).toString();
+		fullCont.append(packet);
+		String sign=genSignature(packet);
+		System.out.println(sign+"   "+blckTag);
+		if(!sign.equals(blckTag))
+		{
+			bP=false;
+		}
+	}
+	String fullsign=genSignature(fullCont.toString());
+	extension=spl[3].toString();
+	sessionMap.put("ext",extension);
+	System.out.println(fullsign+"   "+spl[4].toString());
+	if(!fullsign.equals(spl[4].toString()))
+	{
+		System.out.println("full content sign not verified");
+		bF=false;
+	}
+	if(bP && bF)
+	{
+		System.out.println("both content sign verified");
+		sessionMap.put("mapforuserfile",lmFOrUser);
+		return fullCont.toString();
+	}
+	return "";		
+}	
+public String genSignature(String packet)
+{
+	StringBuffer sb=null; 
+	try
+	{
+	MessageDigest mdP = MessageDigest.getInstance("MD5");
+	
+	mdP.update(packet.getBytes());
+	byte mdbytes[] = mdP.digest();
+	sb = new StringBuffer();
+	for (int i = 0; i < mdbytes.length; i++) 
+	{
+		sb.append(Integer.toString((mdbytes[i] & 0xff) + 0x100, 16).substring(1));
+	}
+	}
+	catch(Exception e)
+	{
+		e.printStackTrace();
+	}			
+	return sb.toString();
+}
+public void fileList(String usName)
+{
+	LinkedHashMap readUsrFile=new LinkedHashMap();
+	readUsrFile=fat.readSerFile();	
+	Iterator it2=readUsrFile.keySet().iterator();
+	while(it2.hasNext())
+	{
+		String key=it2.next().toString();
+		String usrnm=usName.trim();
+		if(key.contains(usrnm))
+		{  
+			StringTokenizer stt=new StringTokenizer(key,"-");
+			String un=stt.nextToken().toString();
+			String file=stt.nextToken().toString();				
+			String ext=((LinkedHashMap)readUsrFile.get(key)).keySet().toString().split("_")[3];			
+			String splFile=file.split("\\.")[0].toString()+"."+ext;	
+			downfilelist.add(splFile);
+		}			
+	}
+}
+public String deleteFile()
+{
+	try
+	{	
+		String fNmeWthOutExt=flistName.split("\\.")[0].toString();					
+		String userfNme=fNmeWthOutExt+".txt";
+		auditingMap.put("UserProcess", userfNme);	
+		String auditAccessFile="";
+		if(currentAuditList!=null&&!currentAuditList.isEmpty())
+		{
+			while (currentAuditList.get(0).toString().equalsIgnoreCase(userfNme))
+			{
+				Thread.sleep(100);
+			}
+		}
+		else{
+			System.out.println("Auditing not yet Started...");
+		}
+//		System.out.println(auditingMap);
+//		if(auditingMap.containsKey("AuditProcess"))
+//		{
+//			auditAccessFile=auditingMap.get("AuditProcess").toString();
+//			System.out.println("******************* "+userfNme+" "+auditAccessFile);
+//			while (!auditAccessFile.equalsIgnoreCase(userfNme))
+//			{
+//				auditAccessFile=auditingMap.get("AuditProcess").toString();
+//				Thread.sleep(100);
+//			}			
+//			auditingMap.put("UserProcess", userfNme);			
+//		}
+//		else
+//		{
+//			auditingMap.put("UserProcess", userfNme);			
+//		}		
+//		System.out.println("after ==== "+auditingMap);
+		String webSerStatus="";
+		fileList(userName);
+		LinkedHashMap readMap=fat.retrieveFat(fNmeWthOutExt+".txt",userName);
+		Iterator it=readMap.keySet().iterator();
+		while(it.hasNext())
+		{
+			String key=it.next().toString();
+			String loc=readMap.get(key).toString();
+			String split[]=key.split("@");	
+			String blckMapString=split[0].toString();
+			String mapSpl[]=blckMapString.split("_");
+			String dataBlckNo=mapSpl[1].toString();			
+			AccessServiceCall ser=new AccessServiceCall();
+			webSerStatus=ser.delete(loc, "BLOCK"+dataBlckNo, fNmeWthOutExt+".txt");			
+		}	
+		if(webSerStatus.equals("success"))
+		{
+			status="success";
+			fat.deleteUserFat(fNmeWthOutExt+".txt",userName);
+			addActionMessage("File Deleted");
+		}
+		else
+		{
+			addActionMessage("Problem while deleting");
+			status="error";
+		}
+//		auditingMap.clear();
+		//auditingMap.remove("AuditProcess");
+	}
+	catch (Exception e) {
+		e.printStackTrace();
+	}
+	
+	return status;
+}
+public String recoverUserComplaint()
+{
+	try
+	{		
+		String recStatus="";
+//		String uNme=sessionMap.get("usrname").toString();
+		fileList(userName);
+//		String fSelName=sessionMap.get("selectedfile").toString();
+		setFlistName(fileName);
+		String arr[]=fileName.split("\\.");
+		String fNmeWthOutExt=arr[0].toString().trim();
+		String extension=arr[1].toString().trim();
+		File fTxt=new File("webapps/IdentityBased/UploadStorage/"+fNmeWthOutExt+"_enc.txt");
+		ReDistribute(userName,fTxt, extension, fNmeWthOutExt);
+		if(type==null)
+		{
+			recStatus=downloadFile();
+		}
+			
+//		LinkedHashMap luser=(LinkedHashMap)sessionMap.get("mapforuserfile");
+//		
+//		System.out.println("recover user com "+fSelName+" "+luser.toString());
+//		AuditingJob aj=new AuditingJob();
+//		Vector vCheckUser=new Vector();
+//		for(int i=0;i<luser.size();i++)
+//		{
+//			vCheckUser.add(i);
+//		}
+//		String recStatus=aj.prepareAuditMap(vCheckUser, luser, fSelName);
+		System.out.println("recStatus"+recStatus);
+		if(recStatus.equalsIgnoreCase("success"))
+		{
+			msg="";
+			recMsg="recover";
+			status="success";
+		}
+		else
+		{
+			msg="";
+			recMsg="fail";
+			status="error";
+		}
+	}
+	catch (Exception e) {
+		e.printStackTrace();
+	}
+	return status;
+}
+
+public String downloadUserFile()
+{
+	String fSelName=sessionMap.get("selectedfile").toString();
+	File fd=new File("");
+	abspath=fd.getAbsolutePath()+"//webapps//IdentityBased//UploadStorage//"+fSelName;
+	fileToDownload = new File(abspath.trim());
+     try {
+		inputStream = new FileInputStream(fileToDownload);
+	} catch (FileNotFoundException e) {
+		e.printStackTrace();
+	}
+     
+     fileName = fileToDownload.getName().trim();
+     contentLength = fileToDownload.length();
+		
+	status="success";
+	return status;
+}
+public void auditStatusCheck(String usrFNme)
+{
+	if(currentAuditList!=null&&!currentAuditList.isEmpty())
+	{
+		try{
+		while (currentAuditList.get(0).toString().equalsIgnoreCase(usrFNme))
+		{
+			Thread.sleep(100);
+		}
+		}
+		catch (Exception e) {
+			auditStatusCheck(usrFNme);
+		}
+	}
+	else{
+		System.out.println("Auditing not yet Started...");
+	}
+}
+}

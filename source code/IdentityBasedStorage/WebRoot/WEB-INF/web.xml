@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" 
+	xmlns="http://java.sun.com/xml/ns/javaee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+ 
+  <servlet>
+  	<description>JAX-WS endpoint - FileUploadService1</description>
+  	<display-name>FileUploadService1</display-name>
+  	<servlet-name>FileUploadService1</servlet-name>
+  	<servlet-class>
+  		com.sun.xml.ws.transport.http.servlet.WSServlet
+  	</servlet-class>
+  	<load-on-startup>1</load-on-startup>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>FileUploadService1</servlet-name>
+  	<url-pattern>/DeleteFilePort1</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>FileUploadService1</servlet-name>
+  	<url-pattern>/PublicAuditPort</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>FileUploadService1</servlet-name>
+  	<url-pattern>/FileUploadPort</url-pattern>
+  </servlet-mapping>
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+  
+  <listener>
+  	<listener-class>
+  		com.logic.RecoverJob  	
+  	</listener-class>
+  	
+  </listener>
+  <listener>
+  	<listener-class>
+  		com.sun.xml.ws.transport.http.servlet.WSServletContextListener
+  	</listener-class>
+  </listener></web-app>

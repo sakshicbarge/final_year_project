@@ -1,0 +1,218 @@
+package com.logic;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.security.MessageDigest;
+import java.util.LinkedHashMap;
+import java.util.Random;
+import java.util.Vector;
+
+public class BlockSplit {
+	StringBuffer fulContent = new StringBuffer();
+	StringBuffer sb1=new StringBuffer();
+	String convergentkey;
+	File newFile;
+	String fileNme;
+	int partCounter = 0;
+	StringBuffer packContent;
+	MessageDigest mdF;
+	MessageDigest mdP;
+	long sourceSize;
+	StringBuffer sb;
+	String extention;
+	LinkedHashMap lkm=new LinkedHashMap();
+	LinkedHashMap lkmTag=new LinkedHashMap();
+	public Vector splitFile(File Sourcef,String ext) throws Exception 
+	{
+		this.extention=ext;
+		String destSaveBlock = "webapps\\IdentityBased\\UploadStorage\\Blocks\\";
+		String fnme = Sourcef.getName().trim();
+		int maxReadBufferSize=0; 
+		fileNme=fnme.split("\\.")[0]+".txt";
+		mdF = MessageDigest.getInstance("MD5");
+		RandomAccessFile raf = new RandomAccessFile(Sourcef, "r");
+		sourceSize = raf.length();
+		System.out.println("Source file Size is in upload"+sourceSize);
+		System.out.println("The File Extension is :"+ext);
+		//Image Type Splitting Size
+		Random r=new Random();
+		int val=r.nextInt(1024);
+		while(val<512)
+		{
+			val=r.nextInt(1024);
+		}	
+		System.out.println("val "+val);
+		if(ext.equalsIgnoreCase("ANI")||ext.equalsIgnoreCase("jpeg")||ext.equalsIgnoreCase("png")||ext.equalsIgnoreCase("jpg")||ext.equalsIgnoreCase("gif")||ext.equalsIgnoreCase("psd")||ext.equalsIgnoreCase("pbm")||ext.equalsIgnoreCase("Mac"))
+		{
+			System.out.println("File Type is Image");
+			if(sourceSize<=500000)			//File size less than 500 kb
+				maxReadBufferSize=val*20;	//20kb
+			else if(sourceSize<=1000000)	//File size less than 1mb
+				maxReadBufferSize=val*50;	//50kb
+			else 							//File size greater than 1 mb...
+				maxReadBufferSize=val*100;	//100kb
+		}
+		
+		//Video Type Splitting Size
+		else if(ext.equalsIgnoreCase("mpeg")||ext.equalsIgnoreCase("avi")||ext.equalsIgnoreCase("wmv")||ext.equalsIgnoreCase("mpg")||ext.equalsIgnoreCase("mp4")||ext.equalsIgnoreCase("vob")||ext.equalsIgnoreCase("rm")||ext.equalsIgnoreCase("flv"))
+		{					
+			System.out.println("File Type is video");
+			if(sourceSize<=10000000)			//File size less than 10mb
+				maxReadBufferSize=val*1000;		//1000 kb
+			else if(sourceSize<=20000000)		//File size less than 20mb
+				maxReadBufferSize=val*2000;		//2000 kb
+			else if(sourceSize<=30000000)		//File size less than 30mb
+				maxReadBufferSize=val*5000;		//5000 kb
+			else 								//File size greater than 30mb
+				maxReadBufferSize=val*10000;	//10000 kb
+		}
+	
+		else if(ext.equalsIgnoreCase("txt")||ext.equalsIgnoreCase("java")||ext.equalsIgnoreCase("csv")||ext.equalsIgnoreCase("html")||ext.equalsIgnoreCase("doc")||ext.equalsIgnoreCase("docx"))
+		{
+			System.out.println("File type is Text");
+			if(sourceSize<=50000)
+				 maxReadBufferSize = val * 5; // 10KB
+			else if(sourceSize<=100000)
+				 maxReadBufferSize = val * 10; // 20KB
+			else if(sourceSize<=500000)
+				 maxReadBufferSize = val * 50; // 50KB
+			else if(sourceSize<=1000000)
+				 maxReadBufferSize = val * 100; // 100kb
+			else if(sourceSize<=5000000)
+				 maxReadBufferSize = val * 500; // 500kb
+			else 
+				 maxReadBufferSize = val * 1000; // 1mb
+			
+			
+//			if(sourceSize<=500000)
+//				 maxReadBufferSize = 1024 * 10; // 200KB
+//			else if(sourceSize<=1000000)
+//				 maxReadBufferSize = 1024 * 20; // 200KB
+//			else if(sourceSize<=5000000)
+//				 maxReadBufferSize = 1024 * 50; // 500KB
+//			else if(sourceSize<=10000000)
+//				 maxReadBufferSize = 1024 * 100; // 1mb
+//			else if(sourceSize<=50000000)
+//				 maxReadBufferSize = 1024 * 500; // 5mb
+//			else 
+//				 maxReadBufferSize = 1024 * 1000; // 10mb
+		}
+		else
+		{
+			 Thread.sleep(1000);
+			 maxReadBufferSize = val * 200; // 200KB
+		}
+		long numSplits = sourceSize / maxReadBufferSize;
+		System.out.println("=== "+sourceSize+" "+maxReadBufferSize+" "+numSplits);
+		long bytesPerSplit;
+		long  remainingBytes;
+//		System.out.println("Source FIle Size is "+sourceSize);
+		if(numSplits==0)
+		{
+			bytesPerSplit =0;
+			remainingBytes = sourceSize ;
+		}
+		else
+		{
+			bytesPerSplit = sourceSize / numSplits;
+			remainingBytes = sourceSize % numSplits;
+			System.out.println("SIze less than 20 Kb..bytesPerSplit "+bytesPerSplit+" remainingBytes"+remainingBytes);
+		}
+		
+		for (int destIx = 1; destIx <= numSplits; destIx++) 
+		{			
+			mdP = MessageDigest.getInstance("MD5");
+			packContent = new StringBuffer();
+			if (bytesPerSplit > maxReadBufferSize) 
+			{
+				
+				long numReads = bytesPerSplit / maxReadBufferSize;
+				long numRemainingRead = bytesPerSplit % maxReadBufferSize;
+//				System.out.println("numReads " + numReads);
+				for (int i = 0; i < numReads; i++) 
+				{
+					readWrite(raf, maxReadBufferSize);
+				}
+//				System.out.println("numRemainingRead " + numRemainingRead);
+				if (numRemainingRead > 0) 
+				{
+//					System.out.println("came remaining in max");
+					readWrite(raf, numRemainingRead);
+				}
+			} 
+			else 
+			{
+//				System.out.println("min");
+				readWrite(raf, bytesPerSplit);
+			}
+			addTag("Packet");
+		}
+		if (remainingBytes > 0) 
+		{
+			mdP = MessageDigest.getInstance("MD5");
+//			System.out.println("The last packet came with bytes "+ remainingBytes);			
+			packContent = new StringBuffer();
+			readWrite(raf, remainingBytes);			
+			addTag("Packet");			
+		}
+		raf.close();
+		//System.out.println(lkm.toString());
+		addTag("File");
+		Vector<LinkedHashMap> vRet=new Vector<LinkedHashMap>();
+		vRet.add(lkm);
+		vRet.add(lkmTag);
+//		System.out.println("vRect"+vRet.toString());
+		return vRet;
+	}
+	public void readWrite(RandomAccessFile raf, long numBytes)throws IOException
+	{
+		try 
+		{
+//			System.out.println("numBytes= "+numBytes);
+			byte[] buf = new byte[(int) numBytes];
+//			System.out.println("numBytes= "+buf);
+			int val = raf.read(buf);
+			String blckContent = new String(buf, "UTF-8").trim();
+			packContent.append(blckContent.trim());
+			mdF.update(buf);
+			mdP.update(buf);
+			lkm.put("s"+partCounter, packContent);
+			
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	public void addTag(String mode)
+	{
+		byte[] mdbytes;
+		if(mode.equalsIgnoreCase("Packet"))
+		{
+		mdbytes = mdP.digest();
+		}
+		else
+		{
+		mdbytes = mdF.digest();
+		}
+		sb = new StringBuffer();
+		for (int i = 0; i < mdbytes.length; i++) 
+		{
+			sb.append(Integer.toString((mdbytes[i] & 0xff) + 0x100, 16).substring(1));
+		}
+		if(mode.equalsIgnoreCase("packet"))
+		{
+			lkmTag.put("pt"+partCounter,sb.toString().trim());
+		}
+		else
+		{
+			lkmTag.put("ft"+partCounter,sb.toString().trim());
+		}
+		partCounter++;
+//		System.out.println("lkmTag"+lkmTag);
+		
+	}
+}

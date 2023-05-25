@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="melibrary.com.genuitec.eclipse.j2eedt.core.MYECLIPSE_JAVAEE_5_CONTAINER"/>
+	<classpathentry kind="con" path="melibrary.com.genuitec.eclipse.struts2.MYECLIPSE_STRUTS21_CORE"/>
+	<classpathentry kind="lib" path="WebRoot/jars/commons-fileupload-1.1.1.jar"/>
+	<classpathentry kind="lib" path="WebRoot/jars/commons-fileupload-1.2.2.jar"/>
+	<classpathentry kind="lib" path="WebRoot/jars/commons-io-1.1.jar"/>
+	<classpathentry kind="lib" path="WebRoot/jars/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="WebRoot/jars/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="WebRoot/jars/mysql-connector-java-5.0.4-bin.jar"/>
+	<classpathentry kind="lib" path="WebRoot/jars/org.eclipse.swt.win32.win32.x86_3.4.0.v3448f.jar"/>
+	<classpathentry kind="lib" path="WebRoot/jars/org.mortbay.jetty.jar"/>
+	<classpathentry kind="lib" path="WebRoot/jars/quartz-2.2.1.jar"/>
+	<classpathentry kind="lib" path="WebRoot/jars/quartz-jobs-2.2.1.jar"/>
+	<classpathentry kind="lib" path="WebRoot/jars/slf4j-api-1.6.6.jar"/>
+	<classpathentry kind="lib" path="WebRoot/jars/slf4j-log4j12-1.6.6.jar"/>
+	<classpathentry kind="con" path="melibrary.com.genuitec.eclipse.ws.xfire.MYECLIPSE_JAXWS_API"/>
+	<classpathentry kind="con" path="melibrary.com.genuitec.eclipse.ws.xfire.MYECLIPSE_METRO_IMPL"/>
+	<classpathentry kind="lib" path="WebRoot/jars/jutils-2.1.jar"/>
+	<classpathentry kind="output" path="WebRoot/WEB-INF/classes"/>
+</classpath>

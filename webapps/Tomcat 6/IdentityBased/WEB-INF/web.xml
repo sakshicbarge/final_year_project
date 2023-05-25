@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" 
+	xmlns="http://java.sun.com/xml/ns/javaee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+  <filter>
+  	<filter-name>struts2</filter-name>
+  	<filter-class>
+  		org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter
+  	</filter-class>
+  	<init-param>
+	<param-name>actionPackages</param-name>
+	<param-value>com.logic</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+  	<filter-name>struts2</filter-name>
+  	<url-pattern>/*</url-pattern>
+  </filter-mapping>
+    <listener>
+  		<listener-class>com.db.DbListener</listener-class>
+  </listener>
+  <servlet>
+    <description>This is the description of my J2EE component</description>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>Blockchain</servlet-name>
+    <servlet-class>com.logic.Blockchain</servlet-class>
+  </servlet>
+  <servlet>
+    <description>This is the description of my J2EE component</description>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>BlockChainRetrival</servlet-name>
+    <servlet-class>com.logic.BlockChainRetrival</servlet-class>
+  </servlet>
+ <servlet>
+    <description>This is the description of my J2EE component</description>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>Serverconnection</servlet-name>
+    <servlet-class>com.logic.Serverconnection</servlet-class>
+  </servlet>
+  <servlet>
+    <description>This is the description of my J2EE component</description>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>Server</servlet-name>
+    <servlet-class>com.logic.Server</servlet-class>
+  </servlet>
+  <servlet>
+    <description>This is the description of my J2EE component</description>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>BlockChainAdd</servlet-name>
+    <servlet-class>com.logic.BlockChainAdd</servlet-class>
+  </servlet>
+
+
+ 
+
+  <servlet-mapping>
+    <servlet-name>Blockchain</servlet-name>
+    <url-pattern>/Blockchain</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>BlockChainRetrival</servlet-name>
+    <url-pattern>/BlockChainRetrival</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Server</servlet-name>
+    <url-pattern>/Server</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>BlockChainAdd</servlet-name>
+    <url-pattern>/BlockChainAdd</url-pattern>
+  </servlet-mapping>
+  </web-app>

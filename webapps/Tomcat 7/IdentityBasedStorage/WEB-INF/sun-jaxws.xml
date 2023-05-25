@@ -1,0 +1,15 @@
+<?xml version = "1.0"?>
+<endpoints version="2.0"
+	xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime">
+	<endpoint name="FileUploadPort"
+		implementation="com.logic.FileUploadDelegate"
+		url-pattern="/FileUploadPort">
+	</endpoint>
+	<endpoint name="PublicAuditPort"
+		implementation="com.logic.PublicAuditDelegate"
+		url-pattern="/PublicAuditPort">
+	</endpoint>
+	<endpoint name="DeleteFilePort1"
+		implementation="com.logic.DeleteFileDelegate"
+		url-pattern="/DeleteFilePort1">
+	</endpoint></endpoints>

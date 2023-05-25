@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://logic.com/" targetNamespace="http://logic.com/" version="1.0">
+
+  <xs:element name="fetchFileCon" type="tns:fetchFileCon"/>
+
+  <xs:element name="fetchFileConResponse" type="tns:fetchFileConResponse"/>
+
+  <xs:element name="finalizecheck" type="tns:finalizecheck"/>
+
+  <xs:element name="finalizecheckResponse" type="tns:finalizecheckResponse"/>
+
+  <xs:element name="genSignature" type="tns:genSignature"/>
+
+  <xs:element name="genSignatureResponse" type="tns:genSignatureResponse"/>
+
+  <xs:element name="startAudit" type="tns:startAudit"/>
+
+  <xs:element name="startAuditResponse" type="tns:startAuditResponse"/>
+
+  <xs:complexType name="finalizecheck">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="finalizecheckResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="genSignature">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="genSignatureResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="fetchFileCon">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg1" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="fetchFileConResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="startAudit">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="arg0" type="xs:anyType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="startAuditResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

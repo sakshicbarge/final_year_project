@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="IdentityBasedStorage"
+  id="myeclipse.1436266142516"
+  context-root="/IdentityBasedStorage"
+  j2ee-spec="5.0"
+  archive="IdentityBasedStorage.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

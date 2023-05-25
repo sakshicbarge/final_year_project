@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+
+<constant name="struts.multipart.maxSize" value="524288000"></constant>
+<constant name="struts.enable.DynamicMethodInvocation" value="false"></constant>
+<constant name="struts.devMode" value="true"></constant>
+	<package name="default" extends="json-default" namespace="/">
+	
+	<interceptors>
+        <interceptor name="json" class="org.apache.struts2.json.JSONInterceptor"/>
+        
+    </interceptors>
+    
+    <action name="Audit" class="com.logic.PublicAudit">
+    <interceptor-ref name="json" />
+	<result type="json"/>			
+	</action> 
+	
+	<action name="pause" class="com.logic.AuditingJob" method="pauseAuditing">
+	<result name="success">Auditing.jsp</result>
+	</action>
+	<action name="resume" class="com.logic.AuditingJob" method="resumeAuditing">
+	<result name="success">Auditing.jsp</result>
+	</action>
+	<action name="clear" class="com.logic.PublicAudit" method="clear">
+	<result name="success">Auditing.jsp</result>
+	</action>
+	
+	<action name="choose" class="com.logic.Download" method="selectOption">
+	<result name="success">Upload.jsp</result>
+	<result name="error">Upload.jsp</result>
+	</action>
+	
+	<action name="fat" class="com.logic.UserFATTable">	
+	<interceptor-ref name="defaultStack"></interceptor-ref>  	
+	<interceptor-ref name="json" />	
+	<result type="json"/>
+	</action>
+	
+	<action name="register" class="com.logic.Register">		
+		<result name="success">Register.jsp</result>	
+		<result name="input">Register.jsp</result>			
+		<result name="error">Register.jsp</result>		
+	</action>
+	
+	<action name="login" class="com.logic.Login" method="execute">		
+		<result name="success">Upload.jsp</result>
+		<result name="error">index.jsp</result>		
+    </action>
+    
+    <action name="admin" class="com.logic.AdminLogin">		
+		<result name="success">Admin.jsp</result>	
+		<result name="error">AdminLog.jsp</result>		
+    </action>
+    
+    <action name="download" class="com.logic.Download">		
+		<result name="success">Upload.jsp</result>
+		<result name="input">Upload.jsp</result>	
+	</action>
+	
+	<action name="deleteFile" class="com.logic.Admin" method="deleteUploadFiles">		
+		<result name="success">Admin.jsp</result>
+		<result name="error">Admin.jsp</result>	
+	</action>
+	
+	<action name="corrupt" class="com.logic.Download" method="recoverUserComplaint">		
+		<result name="success">Upload.jsp</result>
+		<result name="error">Upload.jsp</result>	
+	</action>
+	
+	<action name="conflict" class="com.logic.Admin" method="conflictIP">		
+		<result name="success">Admin.jsp</result>
+		<result name="error">Admin.jsp</result>		
+	</action>
+	
+	<action name="retain" class="com.logic.Admin" method="retainIP">		
+		<result name="success">Admin.jsp</result>
+		<result name="error">Admin.jsp</result>		
+	</action>
+	
+	<action name="attack" class="com.logic.Attacker">		
+		<result name="success">Attacker.jsp</result>
+		<result name="error">Attacker.jsp</result>		
+	</action>
+	
+	<action name="delete" class="com.logic.Download" method="deleteFile">		
+		<result name="success">Upload.jsp</result>
+		<result name="error">Upload.jsp</result>		
+	</action>
+	
+	<action name="files" class="com.logic.Attacker" method="saveFile">		
+		<result name="success">Attacker.jsp</result>
+		<result name="error">Attacker.jsp</result>		
+	</action>
+	<action name="filesDyna" class="com.logic.Attacker" method="getFilesFromServer">		
+		<result name="success">Attacker.jsp</result>
+		<result name="error">Attacker.jsp</result>		
+	</action>
+	
+	<action name="auditTime" class="com.logic.Admin" method="setTime">		
+		<result name="success">Admin.jsp</result>
+		<result name="error">Admin.jsp</result>		
+	</action>
+	
+	<action name="saveProperty" class="com.logic.Admin">		
+		<result name="success">Admin.jsp</result>
+		<result name="error">Admin.jsp</result>	
+	</action>
+	
+	<action name="server" class="com.logic.Admin" method="serverCount">		
+		<result name="success">Admin.jsp</result>
+		<result name="error">Admin.jsp</result>	
+	</action>
+	
+	 <action name="downloadFile" class="com.logic.Download" method="downloadFile"> 		
+		<result name="success">Upload.jsp</result>
+		<result name="error">Upload.jsp</result>	
+	</action>
+	
+	<action name="downloadUsrFile" class="com.logic.Download" method="downloadUserFile">	
+		<result name="success" type="stream">
+        <param name="contentType">application/octet-stream</param>
+        <param name="allowedTypes">image/gif,image/jpeg,image/jpg,image/png,application/msword,
+ application/mspowerpoint,text/doc,text/plain,application/pdf,application/ms-excel,application/xml,application/powerpoint,audio/mpeg3,audio/x-mpeg-3,video/mpeg,video/x-mpeg,audio/wav,application/x-mspowerpoint,application/vnd.ms-excel,video/avi</param>
+  
+        <param name="inputName">inputStream</param>
+		<param name="contentDisposition">attachment;filename="${fileName}"></param>
+        <param name="bufferSize">4096</param>
+        </result>      
+	</action>
+		
+	<action name="fileUpload" class="com.logic.Upload" method="execute">
+		<interceptor-ref name="exception" />
+		<interceptor-ref name="i18n" />
+		<interceptor-ref name="fileUpload">
+		<param name="allowedTypes">image/gif,image/jpeg,image/jpg,image/png,application/msword,
+ 		application/mspowerpoint,text/doc,text/plain,application/pdf,application/ms-excel,application/xml,application/powerpoint,audio/mpeg3,audio/x-mpeg-3,video/mpeg,video/x-mpeg,audio/wav,application/x-mspowerpoint,application/vnd.ms-excel,video/avi,video/mp4,mp4</param>            
+		</interceptor-ref>
+		<interceptor-ref name="defaultStack"></interceptor-ref>  	
+		<interceptor-ref name="params">
+		<param name="excludeParams">dojo\..*,^struts\..*</param>
+		</interceptor-ref>
+		<interceptor-ref name="validation">
+		<param name="excludeMethods">input,back,cancel,browse</param>
+		</interceptor-ref>
+		<interceptor-ref name="workflow">
+		<param name="excludeMethods">input,back,cancel,browse</param>
+		</interceptor-ref>
+		<result name="success">Upload.jsp</result>
+		<result name="error">Upload.jsp</result>
+	</action>
+	
+	</package>
+
+</struts>    
